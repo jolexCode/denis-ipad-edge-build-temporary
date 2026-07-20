@@ -1,0 +1,96 @@
+name: Denis iPad Native Edge
+
+permissions:
+  contents: read
+
+concurrency:
+  group: denis-ipad-native-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [field-trial/autonomous-loop-v1]
+    paths:
+      - apps/ipad-native-client/**
+      - .github/workflows/ipad-native-build.yml
+
+jobs:
+  build-native-ipa:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      APP_ROOT: apps/ipad-native-client
+      DERIVED_DATA: apps/ipad-native-client/build
+    steps:
+      - uses: actions/checkout@v4
+      - name: Seal Apple toolchain
+        run: |
+          set -euo pipefail
+          xcodebuild -version
+          xcrun --sdk iphoneos --show-sdk-version
+          xcrun --sdk iphoneos --show-sdk-path
+          test -d "$(xcrun --sdk iphoneos --show-sdk-path)/System/Library/Frameworks/FoundationModels.framework"
+          swift --version
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate project
+        working-directory: ${{ env.APP_ROOT }}
+        run: xcodegen generate
+      - name: Resolve Swift packages
+        working-directory: ${{ env.APP_ROOT }}
+        run: |
+          xcodebuild -resolvePackageDependencies \
+            -project DenisVoice.xcodeproj \
+            -scheme DenisVoice \
+            -sdk iphoneos
+      - name: Build native app
+        working-directory: ${{ env.APP_ROOT }}
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project DenisVoice.xcodeproj \
+            -scheme DenisVoice \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build \
+            -resultBundlePath build/DenisVoice.xcresult \
+            ONLY_ACTIVE_ARCH=NO \
+            ARCHS=arm64 \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" | tee build/xcodebuild.log
+      - name: Package unsigned IPA
+        working-directory: ${{ env.APP_ROOT }}
+        run: |
+          set -euo pipefail
+          APP_BUNDLE="$(find build/Build/Products/Release-iphoneos -maxdepth 1 -type d -name '*.app' -print -quit)"
+          test -n "$APP_BUNDLE"
+          mkdir -p build/ipa/Payload
+          cp -R "$APP_BUNDLE" build/ipa/Payload/
+          plutil -p build/ipa/Payload/*.app/Info.plist
+          file build/ipa/Payload/*.app/Denis
+          ditto -c -k --sequesterRsrc --keepParent build/ipa/Payload build/ipa/DenisVoice_native_unsigned.ipa
+          shasum -a 256 build/ipa/DenisVoice_native_unsigned.ipa > build/ipa/DenisVoice_native_unsigned.ipa.sha256
+          printf '{"schema":"DENIS_IPAD_NATIVE_BUILD_V1","commit":"%s","run_id":"%s","xcode":"%s","sdk":"%s"}\n' \
+            "$GITHUB_SHA" "$GITHUB_RUN_ID" "$(xcodebuild -version | tr '\n' ' ')" "$(xcrun --sdk iphoneos --show-sdk-version)" \
+            > build/ipa/build-manifest.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DenisVoice-native-unsigned
+          path: |
+            apps/ipad-native-client/build/ipa/DenisVoice_native_unsigned.ipa
+            apps/ipad-native-client/build/ipa/DenisVoice_native_unsigned.ipa.sha256
+            apps/ipad-native-client/build/ipa/build-manifest.json
+          if-no-files-found: error
+          retention-days: 3
+      - name: Preserve compiler evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: DenisVoice-build-evidence
+          path: |
+            apps/ipad-native-client/build/xcodebuild.log
+            apps/ipad-native-client/build/DenisVoice.xcresult
+          if-no-files-found: ignore
+          retention-days: 3

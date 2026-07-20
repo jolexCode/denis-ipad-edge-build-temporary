@@ -1,0 +1,64 @@
+name: DenisVoice
+options:
+  bundleIdPrefix: so.denis.voice
+  deploymentTarget:
+    iOS: "26.0"
+  xcodeVersion: "26.0"
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    TARGETED_DEVICE_FAMILY: "2"
+    INFOPLIST_FILE: Sources/DenisVoice/Info.plist
+    PRODUCT_NAME: Denis
+    PRODUCT_BUNDLE_IDENTIFIER: so.denis.voice.client
+    IPHONEOS_DEPLOYMENT_TARGET: "26.0"
+
+packages:
+  Starscream:
+    url: https://github.com/daltoniam/Starscream
+    from: 4.0.6
+
+targets:
+  DenisVoice:
+    type: application
+    platform: iOS
+    sources:
+      - Sources/DenisVoice
+    dependencies:
+      - package: Starscream
+      - framework: Foundation.framework
+      - framework: UIKit.framework
+      - framework: SwiftUI.framework
+      - framework: AVFoundation.framework
+      - framework: CoreMedia.framework
+      - framework: CoreVideo.framework
+      - framework: CoreImage.framework
+      - framework: Accelerate.framework
+      - framework: Speech.framework
+      - framework: Metal.framework
+      - framework: CoreML.framework
+      - framework: LocalAuthentication.framework
+      - framework: Vision.framework
+      - framework: FoundationModels.framework
+      - framework: NaturalLanguage.framework
+      - framework: SoundAnalysis.framework
+      - framework: Network.framework
+      - framework: BackgroundTasks.framework
+      - framework: AppIntents.framework
+    settings:
+      base:
+        INFOPLIST_FILE: Sources/DenisVoice/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: so.denis.voice.client
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: ""
+        DEVELOPMENT_TEAM: ""
+    info:
+      path: Sources/DenisVoice/Info.plist
+    entitlements:
+      path: Sources/DenisVoice/DenisVoice.entitlements
+    preBuildScripts:
+      - name: SwiftLint
+        script: |
+          if which swiftlint >/dev/null; then swiftlint; fi
+        basedOnDependencyAnalysis: false
