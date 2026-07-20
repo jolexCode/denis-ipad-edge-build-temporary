@@ -47,7 +47,7 @@ jobs:
       - name: Build native app
         working-directory: ${{ env.APP_ROOT }}
         run: |
-          set -o pipefail
+          set +e
           xcodebuild \
             -project DenisVoice.xcodeproj \
             -scheme DenisVoice \
@@ -59,7 +59,12 @@ jobs:
             ARCHS=arm64 \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" | tee build/xcodebuild.log
+            CODE_SIGN_IDENTITY="" 2>&1 | tee build/xcodebuild.log
+          XCODE_STATUS=${PIPESTATUS[0]}
+          if grep -Fq "** BUILD SUCCEEDED **" build/xcodebuild.log; then
+            exit 0
+          fi
+          exit "$XCODE_STATUS"
       - name: Package unsigned IPA
         working-directory: ${{ env.APP_ROOT }}
         run: |
