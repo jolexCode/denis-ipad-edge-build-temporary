@@ -53,8 +53,6 @@ targets:
         CODE_SIGN_STYLE: Manual
         CODE_SIGN_IDENTITY: ""
         DEVELOPMENT_TEAM: ""
-    info:
-      path: Sources/DenisVoice/Info.plist
     entitlements:
       path: Sources/DenisVoice/DenisVoice.entitlements
     preBuildScripts:
