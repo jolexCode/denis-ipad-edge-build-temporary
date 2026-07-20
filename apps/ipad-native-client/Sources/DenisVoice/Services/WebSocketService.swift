@@ -239,15 +239,20 @@ class WebSocketService: ObservableObject {
     }
 }
 
+struct EdgeCommand: @unchecked Sendable {
+    let type: String
+    let payload: [String: Any]
+}
+
 class AsyncStreamPipe {
-    private var continuation: AsyncStream<(String, [String: Any])>.Continuation?
-    lazy var stream: AsyncStream<(String, [String: Any])> = {
+    private var continuation: AsyncStream<EdgeCommand>.Continuation?
+    lazy var stream: AsyncStream<EdgeCommand> = {
         AsyncStream { [weak self] cont in
             self?.continuation = cont
         }
     }()
 
     func yield(_ value: (String, [String: Any])) {
-        continuation?.yield(value)
+        continuation?.yield(EdgeCommand(type: value.0, payload: value.1))
     }
 }

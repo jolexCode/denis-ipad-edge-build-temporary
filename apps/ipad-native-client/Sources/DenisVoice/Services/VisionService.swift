@@ -2,6 +2,10 @@ import AVFoundation
 import CoreImage
 import Vision
 
+private struct SendablePixelBuffer: @unchecked Sendable {
+    let value: CVPixelBuffer
+}
+
 @MainActor
 class VisionService: NSObject, ObservableObject {
     @Published var isActive = false
@@ -94,11 +98,12 @@ extension VisionService: AVCaptureVideoDataOutputSampleBufferDelegate {
                                     didOutput sampleBuffer: CMSampleBuffer,
                                     from connection: AVCaptureConnection) {
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
+        let transferableBuffer = SendablePixelBuffer(value: pixelBuffer)
         let timestamp = CMSampleBufferGetPresentationTimeStamp(sampleBuffer).seconds
 
         Task { @MainActor in
-            lastFrameSize = CGSize(width: CVPixelBufferGetWidth(pixelBuffer),
-                                    height: CVPixelBufferGetHeight(pixelBuffer))
+            lastFrameSize = CGSize(width: CVPixelBufferGetWidth(transferableBuffer.value),
+                                    height: CVPixelBufferGetHeight(transferableBuffer.value))
             if lastTimestamp > 0 {
                 frameRate = 1.0 / (timestamp - lastTimestamp)
             }
@@ -107,10 +112,10 @@ extension VisionService: AVCaptureVideoDataOutputSampleBufferDelegate {
 
         Task { @MainActor [weak self] in
             let position = self?.currentCameraPosition ?? "unknown"
-            self?.onFrame?(pixelBuffer, position)
-            self?.faceIDService?.detectFaces(in: pixelBuffer)
-            self?.faceIDService?.checkAttention(in: pixelBuffer)
-            self?.onFaceFrame?(pixelBuffer)
+            self?.onFrame?(transferableBuffer.value, position)
+            self?.faceIDService?.detectFaces(in: transferableBuffer.value)
+            self?.faceIDService?.checkAttention(in: transferableBuffer.value)
+            self?.onFaceFrame?(transferableBuffer.value)
         }
     }
 }

@@ -120,7 +120,9 @@ class AppState: ObservableObject {
         }
 
         Task {
-            for await (type, payload) in webSocket.receivedCommands.stream {
+            for await command in webSocket.receivedCommands.stream {
+                let type = command.type
+                let payload = command.payload
                 if type == "connected" {
                     isConnected = true
                     await registerNode()
