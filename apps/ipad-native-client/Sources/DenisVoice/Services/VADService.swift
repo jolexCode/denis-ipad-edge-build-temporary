@@ -21,11 +21,11 @@ class VADService: ObservableObject {
         }
         guard !samples.isEmpty else { return isVoiceActive }
 
-        var rms: Float = 0
-        var peak: Int16 = 0
-        vDSP_maxv(samples, 1, &peak, vDSP_Length(samples.count))
-        vDSP_rmsqv(samples, 1, &rms, vDSP_Length(samples.count))
-        let normalizedRms = rms / Float(Int16.max)
+        let sumSquares = samples.reduce(Double(0)) { sum, sample in
+            let normalized = Double(sample) / Double(Int16.max)
+            return sum + normalized * normalized
+        }
+        let normalizedRms = Float(sqrt(sumSquares / Double(samples.count)))
 
         voiceLevel = normalizedRms
 

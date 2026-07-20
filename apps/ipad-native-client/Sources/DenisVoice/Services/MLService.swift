@@ -34,7 +34,7 @@ class MLService: ObservableObject {
             throw MLError.modelNotLoaded
         }
         let start = CFAbsoluteTimeGetCurrent()
-        let provider = try MLDictionaryFeatureProvider(dictionary: input as [String: NSObject])
+        let provider = try MLDictionaryFeatureProvider(dictionary: input)
         let result = try model.prediction(from: provider)
         lastInferenceMs = (CFAbsoluteTimeGetCurrent() - start) * 1000
 
@@ -50,7 +50,10 @@ class MLService: ObservableObject {
             throw MLError.modelNotLoaded
         }
         let start = CFAbsoluteTimeGetCurrent()
-        let result = try model.prediction(from: [modelName: pixelBuffer])
+        let provider = try MLDictionaryFeatureProvider(dictionary: [
+            modelName: MLFeatureValue(pixelBuffer: pixelBuffer)
+        ])
+        let result = try model.prediction(from: provider)
         lastInferenceMs = (CFAbsoluteTimeGetCurrent() - start) * 1000
 
         var output = [String: Any]()

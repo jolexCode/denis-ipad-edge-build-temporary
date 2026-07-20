@@ -15,9 +15,11 @@
 import Foundation
 import FoundationModels
 import CryptoKit
+import UIKit
 
+@MainActor
 @available(iOS 26.0, macOS 26.0, *)
-final class FoundationModelsService: Sendable {
+final class FoundationModelsService: ObservableObject {
 
     private let model = SystemLanguageModel.default
     private let sessions: [AppleEdgeSession: LanguageModelSession]

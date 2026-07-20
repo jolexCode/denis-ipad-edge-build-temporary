@@ -150,7 +150,7 @@ struct ParlAIContextBoost: Codable {
     }
 }
 
-struct PipecatRealtimeFrame: Codable {
+struct PipecatRealtimeFrame {
     let frameType: String = "pipecat_realtime_frame"
     let nodeId: String
     let transport: String

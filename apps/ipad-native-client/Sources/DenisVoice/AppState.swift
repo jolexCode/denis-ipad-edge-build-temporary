@@ -31,11 +31,10 @@ class AppState: ObservableObject {
     )
     #endif
 
-    override init() {
+    init() {
         let vendor = UIDevice.current.identifierForVendor?.uuidString.prefix(8) ?? "unknown"
         nodeId = "ipad-m1-\(vendor)"
         appStartTime = Date()
-        super.init()
         configureServices()
     }
 

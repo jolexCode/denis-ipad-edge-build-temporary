@@ -169,12 +169,14 @@ class AudioService: NSObject, ObservableObject {
             )
 
             DispatchQueue.main.async { [self] in
-                level = Float(data.withUnsafeBytes { ptr in
+                level = data.withUnsafeBytes { ptr in
                     let samples = ptr.bindMemory(to: Int16.self)
-                    var maxVal: Int16 = 0
-                    vDSP_maxv(samples.baseAddress!, 1, &maxVal, vDSP_Length(samples.count))
-                    return Float(maxVal) / Float(Int16.max)
-                })
+                    guard !samples.isEmpty else { return 0 }
+                    let peak = samples.reduce(Int32(0)) { current, sample in
+                        max(current, abs(Int32(sample)))
+                    }
+                    return min(1, Float(peak) / Float(Int16.max))
+                }
                 bargeInManager?.observeInputLevel(level)
             }
 

@@ -48,9 +48,15 @@ struct EdgeEmotionFrame: Codable, Sendable {
 }
 
 @Generable
+struct EdgeActionArgument: Codable, Sendable {
+    let key: String
+    let value: String
+}
+
+@Generable
 struct EdgeActionCandidate: Codable, Sendable {
     let tool: String
-    let arguments: [String: String]
+    let arguments: [EdgeActionArgument]
     let safetyLevel: String
     let confidence: Double
     let reasoning: String

@@ -1,5 +1,6 @@
 import Foundation
 import AVFoundation
+import UIKit
 
 @MainActor
 class WorkerService: ObservableObject {
@@ -17,7 +18,7 @@ class WorkerService: ObservableObject {
     struct WorkerTask: Identifiable, Codable {
         let id: String
         let type: String
-        let status: TaskStatus
+        var status: TaskStatus
         let receivedAt: Date
         var completedAt: Date?
         var result: String?
@@ -27,7 +28,7 @@ class WorkerService: ObservableObject {
         }
     }
 
-    override init() {
+    init() {
         capabilities = CapabilitySet()
     }
 

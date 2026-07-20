@@ -16,7 +16,10 @@ class STTService: ObservableObject {
 
     init() {
         recognizer = SFSpeechRecognizer(locale: Locale(identifier: "es-ES"))
-        recognizer?.queue = DispatchQueue(label: "stt.recognition", qos: .userInitiated)
+        let queue = OperationQueue()
+        queue.name = "stt.recognition"
+        queue.qualityOfService = .userInitiated
+        recognizer?.queue = queue
         checkAvailability()
     }
 
@@ -70,9 +73,6 @@ class STTService: ObservableObject {
         isRecognizing = false
     }
 
-    deinit {
-        stopRecognition()
-    }
 }
 
 enum STTError: LocalizedError {
