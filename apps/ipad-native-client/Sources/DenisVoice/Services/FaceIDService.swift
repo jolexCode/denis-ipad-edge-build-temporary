@@ -70,13 +70,12 @@ class FaceIDService: ObservableObject {
         let request = VNDetectFaceRectanglesRequest { [weak self] request, error in
             guard let results = request.results as? [VNFaceObservation] else { return }
             let hasAttention = results.contains { obs in
-                (obs.faceCaptureQuality ?? 0) > 0.5 && (obs.roll.map { abs($0.floatValue) < 0.3 } ?? false)
+                obs.roll.map { abs($0.floatValue) < 0.3 } ?? true
             }
             Task { @MainActor in
                 self?.attentionAware = hasAttention
             }
         }
-        request.faceCaptureQuality = true
         try? VNImageRequestHandler(cvPixelBuffer: pixelBuffer, options: [:]).perform([request])
     }
 

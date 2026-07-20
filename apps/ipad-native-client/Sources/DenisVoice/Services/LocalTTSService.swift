@@ -1,7 +1,7 @@
 @preconcurrency import AVFoundation
 
 @MainActor
-final class LocalTTSService: NSObject, ObservableObject, AVSpeechSynthesizerDelegate {
+final class LocalTTSService: NSObject, ObservableObject, @preconcurrency AVSpeechSynthesizerDelegate {
     @Published private(set) var isSpeaking = false
     private let synthesizer = AVSpeechSynthesizer()
     var onSpeakingChanged: ((Bool) -> Void)?

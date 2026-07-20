@@ -39,8 +39,8 @@ class MLService: ObservableObject {
         lastInferenceMs = (CFAbsoluteTimeGetCurrent() - start) * 1000
 
         var output = [String: Any]()
-        for (key, value) in result.featureValueDictionary {
-            output[key] = value
+        for key in result.featureNames {
+            output[key] = result.featureValue(for: key)
         }
         return output
     }
@@ -57,8 +57,8 @@ class MLService: ObservableObject {
         lastInferenceMs = (CFAbsoluteTimeGetCurrent() - start) * 1000
 
         var output = [String: Any]()
-        for (key, value) in result.featureValueDictionary {
-            output[key] = value
+        for key in result.featureNames {
+            output[key] = result.featureValue(for: key)
         }
         return output
     }
