@@ -27,25 +27,25 @@ targets:
       - Sources/DenisVoice
     dependencies:
       - package: Starscream
-      - framework: Foundation.framework
-      - framework: UIKit.framework
-      - framework: SwiftUI.framework
-      - framework: AVFoundation.framework
-      - framework: CoreMedia.framework
-      - framework: CoreVideo.framework
-      - framework: CoreImage.framework
-      - framework: Accelerate.framework
-      - framework: Speech.framework
-      - framework: Metal.framework
-      - framework: CoreML.framework
-      - framework: LocalAuthentication.framework
-      - framework: Vision.framework
-      - framework: FoundationModels.framework
-      - framework: NaturalLanguage.framework
-      - framework: SoundAnalysis.framework
-      - framework: Network.framework
-      - framework: BackgroundTasks.framework
-      - framework: AppIntents.framework
+      - sdk: Foundation.framework
+      - sdk: UIKit.framework
+      - sdk: SwiftUI.framework
+      - sdk: AVFoundation.framework
+      - sdk: CoreMedia.framework
+      - sdk: CoreVideo.framework
+      - sdk: CoreImage.framework
+      - sdk: Accelerate.framework
+      - sdk: Speech.framework
+      - sdk: Metal.framework
+      - sdk: CoreML.framework
+      - sdk: LocalAuthentication.framework
+      - sdk: Vision.framework
+      - sdk: FoundationModels.framework
+      - sdk: NaturalLanguage.framework
+      - sdk: SoundAnalysis.framework
+      - sdk: Network.framework
+      - sdk: BackgroundTasks.framework
+      - sdk: AppIntents.framework
     settings:
       base:
         INFOPLIST_FILE: Sources/DenisVoice/Info.plist
